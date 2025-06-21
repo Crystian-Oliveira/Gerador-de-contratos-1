@@ -3,11 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Contrato de Casamento - Gerador Inteligente</title>
+  <title>Gerador de Contrato - Oliveira Fotografia</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- Bibliotecas JS corrigidas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.0.0-alpha.12/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-gray-100 p-4">
+
   <div class="max-w-4xl mx-auto bg-white shadow-md rounded p-6">
     <h1 class="text-2xl font-bold mb-4">Gerador Inteligente de Contrato de Casamento</h1>
 
@@ -41,9 +46,107 @@
     </div>
 
     <h2 class="text-xl font-semibold mt-8 mb-2">Contrato Gerado:</h2>
-    <div id="contrato" class="whitespace-pre-wrap border p-4 bg-gray-50 rounded shadow text-sm"></div>
+    <div id="contrato" class="whitespace-pre-wrap border p-4 bg-gray-50 rounded shadow text-sm min-h-[200px]"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    function preencherCampos() {
+      const texto = document.getElementById("inputTexto").value;
+
+      const nomeMatch = texto.match(/se chama ([^,]+)/i);
+      const estadoCivilMatch = texto.match(/, ([^,]+), [^,]+,/);
+      const profissaoMatch = texto.match(/, ([^,]+), CPF/);
+      const cpfMatch = texto.match(/CPF ([\\d.-]+)/i);
+      const rgMatch = texto.match(/RG (\\d+)/i);
+      const enderecoMatch = texto.match(/mora na ([^\\.]+)/i);
+      const dataMatch = texto.match(/dia (\\d{2}\\/\\d{2}\\/\\d{4})/i);
+      const pacoteMatch = texto.match(/pacote ([^ (]+)/i);
+      const coberturaMatch = texto.match(/\\(([^)]+)\\)/);
+      const valorMatch = texto.match(/Pagará R\\$(\\d+[.,]?\\d*)/i);
+      const entradaMatch = texto.match(/entrada de R\\$(\\d+[.,]?\\d*)/i);
+      const parcelasMatch = texto.match(/(\\d+)x de R\\$(\\d+[.,]?\\d*)/i);
+      const formaPagamentoMatch = texto.match(/por ([a-zA-Z]+)/i);
+
+      document.getElementById("nome").value = nomeMatch?.[1] || "";
+      document.getElementById("estadoCivil").value = estadoCivilMatch?.[1] || "";
+      document.getElementById("profissao").value = profissaoMatch?.[1] || "";
+      document.getElementById("cpf").value = cpfMatch?.[1] || "";
+      document.getElementById("rg").value = rgMatch?.[1] || "";
+      document.getElementById("endereco").value = enderecoMatch?.[1] || "";
+      document.getElementById("dataEvento").value = formatarDataISO(dataMatch?.[1]) || "";
+      document.getElementById("pacote").value = pacoteMatch?.[1] || "";
+      document.getElementById("cobertura").value = coberturaMatch?.[1] || "";
+      document.getElementById("valorTotal").value = valorMatch?.[1] || "";
+      document.getElementById("entrada").value = entradaMatch?.[1] || "";
+      document.getElementById("parcelas").value = parcelasMatch?.[1] || "";
+      document.getElementById("valorParcela").value = parcelasMatch?.[2] || "";
+      document.getElementById("formaPagamento").value = formaPagamentoMatch?.[1] || "";
+    }
+
+    function formatarDataISO(dataBR) {
+      if (!dataBR) return "";
+      const [dia, mes, ano] = dataBR.split("/");
+      return `${ano}-${mes}-${dia}`;
+    }
+
+    function gerarContrato() {
+      const nome = document.getElementById("nome").value;
+      const estadoCivil = document.getElementById("estadoCivil").value;
+      const profissao = document.getElementById("profissao").value;
+      const rg = document.getElementById("rg").value;
+      const cpf = document.getElementById("cpf").value;
+      const endereco = document.getElementById("endereco").value;
+      const telefone = document.getElementById("telefone").value;
+      const email = document.getElementById("email").value;
+      const data = document.getElementById("dataEvento").value;
+      const pacote = document.getElementById("pacote").value;
+      const cobertura = document.getElementById("cobertura").value;
+      const valorTotal = document.getElementById("valorTotal").value;
+      const entrada = document.getElementById("entrada").value;
+      const parcelas = document.getElementById("parcelas").value;
+      const valorParcela = document.getElementById("valorParcela").value;
+      const formaPagamento = document.getElementById("formaPagamento").value;
+
+      if (!nome || !data || !pacote || !valorTotal) {
+        alert("Por favor, preencha os campos principais: Nome, Data do Evento, Pacote e Valor Total.");
+        return;
+      }
+
+      const contrato = `
+Contrato de Prestação de Serviço Fotográfico
+
+Contratante: ${nome}, ${estadoCivil || '[estado civil]'}, ${profissao || '[profissão]'}, portador do RG nº ${rg || '[RG]'} e CPF nº ${cpf || '[CPF]'}, residente em ${endereco || '[endereço]'}, telefone ${telefone || '[telefone]'}, e-mail ${email || '[e-mail]'}.
+
+Evento: Casamento agendado para ${data}, com o pacote "${pacote}" incluindo: ${cobertura || '[itens incluídos]'}.
+
+Valor do serviço: R$${valorTotal}, sendo R$${entrada || '0,00'} de entrada e ${parcelas || '0'} parcelas de R$${valorParcela || '0,00'} via ${formaPagamento || '[forma de pagamento]'}.
+
+Ambas as partes concordam com os termos acima e assinam este contrato.
+`;
+
+      document.getElementById("contrato").textContent = contrato.trim();
+    }
+
+    function baixarPDF() {
+      const contrato = document.getElementById("contrato");
+      if (!contrato.textContent.trim()) {
+        alert("Gere o contrato antes de baixar.");
+        return;
+      }
+
+      setTimeout(() => {
+        html2pdf()
+          .set({
+            margin: 1,
+            filename: 'Contrato-de-Casamento.pdf',
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+          })
+          .from(contrato)
+          .save();
+      }, 100);
+    }
+  </script>
+
 </body>
 </html>
