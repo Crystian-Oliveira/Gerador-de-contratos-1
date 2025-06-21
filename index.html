@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contrato de Casamento - Gerador Inteligente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-4xl mx-auto bg-white shadow-md rounded p-6">
+    <h1 class="text-2xl font-bold mb-4">Gerador Inteligente de Contrato de Casamento</h1>
+
+    <textarea id="inputTexto" class="w-full p-3 border rounded mb-4" rows="6"
+      placeholder="Ex: A cliente se chama Amanda Souza, solteira, enfermeira, CPF 111.222.333-44, RG 1234567, mora na Rua das Flores, nº 100, Vitória. Casamento será dia 12/10/2025 com pacote Love (pré-wedding, making of, cerimônia e festa). Pagará R$3.500 com entrada de R$1.000 e 5x de R$500 por transferência."></textarea>
+
+    <button onclick="preencherCampos()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Preencher Dados</button>
+
+    <form class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6" id="formulario">
+      <input class="border p-2" type="text" placeholder="Nome completo" id="nome">
+      <input class="border p-2" type="text" placeholder="Estado civil" id="estadoCivil">
+      <input class="border p-2" type="text" placeholder="Profissão" id="profissao">
+      <input class="border p-2" type="text" placeholder="RG" id="rg">
+      <input class="border p-2" type="text" placeholder="CPF" id="cpf">
+      <input class="border p-2" type="text" placeholder="Endereço completo" id="endereco">
+      <input class="border p-2" type="text" placeholder="Telefone" id="telefone">
+      <input class="border p-2" type="email" placeholder="E-mail" id="email">
+      <input class="border p-2" type="date" id="dataEvento">
+      <input class="border p-2" type="text" placeholder="Pacote" id="pacote">
+      <input class="border p-2" type="text" placeholder="Cobertura" id="cobertura">
+      <input class="border p-2" type="text" placeholder="Valor total (R$)" id="valorTotal">
+      <input class="border p-2" type="text" placeholder="Entrada (R$)" id="entrada">
+      <input class="border p-2" type="text" placeholder="Parcelas" id="parcelas">
+      <input class="border p-2" type="text" placeholder="Valor Parcela (R$)" id="valorParcela">
+      <input class="border p-2" type="text" placeholder="Forma de pagamento" id="formaPagamento">
+    </form>
+
+    <div class="mt-6 flex gap-4">
+      <button onclick="gerarContrato()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Gerar Contrato</button>
+      <button onclick="baixarPDF()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">Baixar PDF</button>
+    </div>
+
+    <h2 class="text-xl font-semibold mt-8 mb-2">Contrato Gerado:</h2>
+    <div id="contrato" class="whitespace-pre-wrap border p-4 bg-gray-50 rounded shadow text-sm"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
