@@ -55,22 +55,44 @@ function gerarContrato() {
   const valorParcela = document.getElementById("valorParcela").value;
   const formaPagamento = document.getElementById("formaPagamento").value;
 
+  if (!nome || !data || !pacote || !valorTotal) {
+    alert("Por favor, preencha ao menos nome, data do evento, pacote e valor total antes de gerar o contrato.");
+    return;
+  }
+
   const contrato = `
 Contrato de Prestação de Serviço Fotográfico
 
-Contratante: ${nome}, ${estadoCivil}, ${profissao}, portador do RG nº ${rg} e CPF nº ${cpf}, residente em ${endereco}, telefone ${telefone}, e-mail ${email}.
+Contratante: ${nome}, ${estadoCivil || '[estado civil]'}, ${profissao || '[profissão]'}, portador do RG nº ${rg || '[RG]'} e CPF nº ${cpf || '[CPF]'}, residente em ${endereco || '[endereço]'}, telefone ${telefone || '[telefone]'}, e-mail ${email || '[e-mail]'}.
 
-Evento: Casamento agendado para ${data}, com o pacote "${pacote}" incluindo: ${cobertura}.
+Evento: Casamento agendado para ${data}, com o pacote "${pacote}" incluindo: ${cobertura || '[itens incluídos]'}.
 
-Valor do serviço: R$${valorTotal}, sendo R$${entrada} de entrada e ${parcelas} parcelas de R$${valorParcela} via ${formaPagamento}.
+Valor do serviço: R$${valorTotal}, sendo R$${entrada || '0,00'} de entrada e ${parcelas || '0'} parcelas de R$${valorParcela || '0,00'} via ${formaPagamento || '[forma de pagamento]'}.
 
 Ambas as partes concordam com os termos acima e assinam este contrato.
-  `;
+`;
 
-  document.getElementById("contrato").textContent = contrato;
+  document.getElementById("contrato").textContent = contrato.trim();
 }
 
 function baixarPDF() {
   const contrato = document.getElementById("contrato");
-  html2pdf().from(contrato).save("Contrato-de-Casamento.pdf");
+  const conteudo = contrato.textContent.trim();
+
+  if (!conteudo) {
+    alert("Gere o contrato antes de tentar baixar o PDF.");
+    return;
+  }
+
+  setTimeout(() => {
+    html2pdf()
+      .set({
+        margin: 1,
+        filename: 'Contrato-de-Casamento.pdf',
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+      })
+      .from(contrato)
+      .save();
+  }, 100);
 }
